@@ -6,20 +6,19 @@
     <div class="mt-3 col-md-6">
       <h4>Danh bạ <i class="fas fa-address-book"></i></h4>
       <ContactList
-        v-if="filteredContactCount > 0"
+        v-if="filteredContactsCount > 0"
         :contacts="filteredContacts"
         v-model:activeIndex="activeIndex"
+        @edit-id="editContact"
       />
       <p v-else>Không có liên hệ nào.</p>
       <div class="mt-3 row justify-content-around align-items-center">
         <button class="btn btn-sm btn-primary" @click="refreshList()">
           <i class="fas fa-redo"></i> Làm mới
         </button>
-
-        <button class="btn btn-sm btn-success" @click="goToAddContact()">
+        <button class="btn btn-sm btn-success" @click="goToAddContact">
           <i class="fas fa-plus"></i> Thêm mới
         </button>
-
         <button class="btn btn-sm btn-danger" @click="removeAllContacts">
           <i class="fas fa-trash"></i> Xóa tất cả
         </button>
@@ -27,23 +26,40 @@
     </div>
     <div class="mt-3 col-md-6">
       <div v-if="activeContact">
-        <h4>Chi tiết liên hệ <i class="fas fa-address-card"></i></h4>
+        <h4>Chi tiết Liên hệ <i class="fas fa-address-card"></i></h4>
         <ContactCard :contact="activeContact" />
+        <router-link
+          :to="{
+            name: 'contact.edit',
+            params: { id: activeContact._id },
+          }"
+        >
+          <span class="mt-2 badge badge-warning">
+            <i class="fas fa-edit"></i> Hiệu chỉnh
+          </span>
+        </router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import contactService from "@/services/contact.service";
 import ContactCard from "@/components/ContactCard.vue";
-import ContactList from "@/components/ContactList.vue";
 import InputSearch from "@/components/InputSearch.vue";
-
+import ContactList from "@/components/ContactList.vue";
+import ContactService from "@/services/contact.service";
 export default {
-  components: { ContactCard, ContactList, InputSearch },
+  components: {
+    ContactCard,
+    InputSearch,
+    ContactList,
+  },
   data() {
-    return { contacts: [], activeIndex: -1, searchText: "" };
+    return {
+      contacts: [],
+      activeIndex: -1,
+      searchText: "",
+    };
   },
   watch: {
     searchText() {
@@ -59,24 +75,24 @@ export default {
     },
     filteredContacts() {
       if (!this.searchText) return this.contacts;
-      return this.contacts.filter((_contact, index) => {
-        this.contactStrings[index].includes(this.searchText);
-      });
+      return this.contacts.filter((_contact, index) =>
+        this.contactStrings[index].includes(this.searchText)
+      );
     },
     activeContact() {
       if (this.activeIndex < 0) return null;
       return this.filteredContacts[this.activeIndex];
     },
-    filteredContactCount() {
+    filteredContactsCount() {
       return this.filteredContacts.length;
     },
   },
   methods: {
     async retrieveContacts() {
       try {
-        this.contacts = await contactService.getAll();
+        this.contacts = await ContactService.getAll();
       } catch (error) {
-        console.log("Error fetching contacts:", error);
+        console.log(error);
       }
     },
     refreshList() {
@@ -84,17 +100,20 @@ export default {
       this.activeIndex = -1;
     },
     async removeAllContacts() {
-      if (confirm("Bạn có chắc chắn muốn xóa tất cả liên hệ không?")) {
+      if (confirm("Bạn muốn xóa tất cả Liên hệ?")) {
         try {
-          await contactService.deleteAll();
+          await ContactService.deleteAll();
           this.refreshList();
         } catch (error) {
-          console.log("Error deleting contacts:", error);
+          console.log(error);
         }
       }
     },
     goToAddContact() {
       this.$router.push({ name: "contact.add" });
+    },
+    editContact(id) {
+      this.$router.push({ name: "contact.edit", params: { id } });
     },
   },
   mounted() {
@@ -102,7 +121,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .page {
   text-align: left;

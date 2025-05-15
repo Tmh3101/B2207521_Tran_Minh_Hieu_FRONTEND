@@ -16,7 +16,7 @@ export default {
 <template>
   <ul class="list-group">
     <li
-      class="list-group-items"
+      class="list-group-item"
       v-for="(contact, index) in contacts"
       :key="contact._id"
       :class="{ active: index === activeIndex }"

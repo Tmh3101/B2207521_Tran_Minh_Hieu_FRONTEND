@@ -1,7 +1,7 @@
 <script>
 export default {
   props: {
-    constact: { type: Object, required: true },
+    contact: { type: Object, required: true },
   },
 };
 </script>
@@ -13,7 +13,7 @@ export default {
       {{ contact.name }}
     </div>
     <div class="p-1">
-      <strong>E-mail</strong>
+      <strong>E-mail:</strong>
       {{ contact.email }}
     </div>
     <div class="p-1">
@@ -21,12 +21,12 @@ export default {
       {{ contact.address }}
     </div>
     <div class="p-1">
-      <strong>Điện thoại</strong>
+      <strong>Điện thoại:</strong>
       {{ contact.phone }}
     </div>
     <div class="p-1">
       <strong>Liên hệ yêu thích:&nbsp;</strong>
-      <span v-if="constact.favorite" class="fas fa-check"></span>
+      <span v-if="contact.favorite" class="fas fa-check"></span>
       <span v-else class="fas fa-times"></span>
     </div>
   </div>
